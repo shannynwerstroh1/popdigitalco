@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The POP Digital Co. — Proof Over Promises</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN TOKENS (from NotebookLM brand system) ── */
+:root {
+  --challenger: #E8541A;   /* The Challenger — burnt orange */
+  --data:       #00A896;   /* The Data — teal */
+  --base:       #0D1B2A;   /* The Base — navy */
+  --premium:    #D4A843;   /* The Premium Accent — gold */
+  --canvas:     #F5F0E8;   /* The Canvas — cream */
+  --canvas-mid: #EDE8DC;
+  --white:      #FFFFFF;
+  --ink-light:  rgba(13,27,42,0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Raleway', sans-serif;
+  background: var(--canvas);
+  color: var(--base);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── GRAIN ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9000; opacity: 0.4;
+}
+
+/* ── CURSOR ── */
+.cur { width:10px; height:10px; background:var(--challenger); border-radius:50%; position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:width .15s,height .15s; mix-blend-mode:multiply; }
+.cur-r { width:32px; height:32px; border:1.5px solid var(--challenger); border-radius:50%; position:fixed; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:transform .12s ease-out; opacity:.45; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:500;
+  display: flex; align-items:center; justify-content:space-between;
+  padding: 18px 52px;
+  background: var(--base);
+  border-bottom: 2px solid rgba(232,84,26,0.4);
+}
+
+.nav-logo {
+  display: flex; flex-direction:column; line-height:1;
+  text-decoration: none;
+}
+.nav-logo-the { font-size:10px; font-weight:300; letter-spacing:.25em; text-transform:uppercase; color:rgba(245,240,232,.5); }
+.nav-logo-pop { font-size:28px; font-weight:900; letter-spacing:-.02em; color:var(--canvas); line-height:.9; }
+.nav-logo-pop span { color:var(--challenger); }
+.nav-logo-co  { font-size:10px; font-weight:300; letter-spacing:.25em; text-transform:uppercase; color:rgba(245,240,232,.4); }
+
+.nav-links { display:flex; gap:32px; list-style:none; align-items:center; }
+.nav-links a { font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(245,240,232,.6); text-decoration:none; transition:color .2s; }
+.nav-links a:hover { color:var(--challenger); }
+.nav-cta {
+  background: var(--challenger) !important; color: var(--canvas) !important;
+  padding: 10px 22px; border-radius:100px;
+  transition: background .2s !important;
+}
+.nav-cta:hover { background: #c44414 !important; }
+
+/* ── HERO ── */
+#home {
+  min-height: 100vh;
+  background: var(--base);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soundwave arch bg pattern */
+#home::after {
+  content:'';
+  position:absolute; right:-60px; top:50%; transform:translateY(-50%);
+  width:500px; height:500px;
+  border-radius:50%;
+  border: 60px solid rgba(0,168,150,.07);
+  box-shadow: 0 0 0 100px rgba(0,168,150,.04), 0 0 0 160px rgba(0,168,150,.025);
+  pointer-events:none;
+}
+
+.hero-left {
+  padding: 80px 52px 80px 52px;
+  display: flex; flex-direction:column; justify-content:center;
+  position: relative; z-index:2;
+}
+
+.hero-eyebrow {
+  font-size:10px; font-weight:700; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--data); margin-bottom:28px;
+  display:flex; align-items:center; gap:12px;
+  opacity:0; animation: fadeUp .6s .1s forwards;
+}
+.hero-eyebrow::before { content:''; width:24px; height:1px; background:var(--data); }
+
+.hero-h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(52px, 5.5vw, 88px);
+  line-height: .95; color: var(--canvas);
+  opacity:0; animation: fadeUp .7s .25s forwards;
+}
+.hero-h1 em { font-style:italic; color:var(--challenger); }
+.hero-h1 .ghost {
+  -webkit-text-stroke:1.5px var(--data);
+  color:transparent;
+}
+
+.hero-copy {
+  font-size:16px; font-weight:300; line-height:1.8;
+  color:rgba(245,240,232,.6);
+  max-width:420px; margin-top:28px;
+  opacity:0; animation: fadeUp .7s .4s forwards;
+}
+
+.hero-pull {
+  margin-top:40px;
+  font-family:'DM Serif Display', serif;
+  font-size:20px; font-style:italic;
+  color:var(--premium);
+  border-left:2px solid var(--challenger); padding-left:18px;
+  opacity:0; animation: fadeUp .7s .52s forwards;
+}
+
+.hero-actions {
+  display:flex; gap:20px; align-items:center; margin-top:44px;
+  opacity:0; animation: fadeUp .7s .64s forwards;
+}
+
+.btn-primary {
+  background:var(--challenger); color:white;
+  padding:15px 34px; border-radius:100px;
+  font-size:12px; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+  text-decoration:none; transition:background .2s, transform .2s;
+  display:inline-block;
+}
+.btn-primary:hover { background:#c44414; transform:translateY(-2px); }
+
+.btn-ghost {
+  color:rgba(245,240,232,.6); font-size:12px; font-weight:700;
+  letter-spacing:.15em; text-transform:uppercase; text-decoration:none;
+  display:flex; align-items:center; gap:8px; transition:color .2s;
+}
+.btn-ghost:hover { color:var(--data); }
+.btn-ghost::after { content:'→'; }
+
+/* Hero right — Badge display */
+.hero-right {
+  display:flex; align-items:center; justify-content:center;
+  position:relative; z-index:2;
+  opacity:0; animation: fadeIn .9s .3s forwards;
+}
+
+.badge-wrap {
+  position:relative; display:flex; flex-direction:column; align-items:center; gap:28px;
+}
+
+/* The Badge — SVG-drawn circular seal */
+.badge {
+  width:280px; height:280px; position:relative;
+  animation: badgeSpin 30s linear infinite;
+}
+
+@keyframes badgeSpin {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+
+.badge svg { width:100%; height:100%; }
+
+.badge-wordmark {
+  display:flex; flex-direction:column; align-items:center; gap:0; animation:none;
+}
+.badge-wordmark .wm-the { font-size:13px; font-weight:300; letter-spacing:.3em; text-transform:uppercase; color:rgba(245,240,232,.45); }
+.badge-wordmark .wm-pop { font-size:72px; font-weight:900; letter-spacing:-.02em; color:var(--canvas); line-height:.9; }
+.badge-wordmark .wm-co  { font-size:13px; font-weight:300; letter-spacing:.3em; text-transform:uppercase; color:rgba(245,240,232,.4); }
+
+/* Ticker */
+.ticker-wrap {
+  position:absolute; bottom:0; left:0; right:0;
+  background:var(--challenger); overflow:hidden; padding:12px 0;
+  border-top:2px solid rgba(255,255,255,.15);
+}
+.ticker { display:flex; width:max-content; animation:tick 28s linear infinite; white-space:nowrap; }
+.ticker-item {
+  font-size:10px; font-weight:700; letter-spacing:.25em; text-transform:uppercase;
+  color:rgba(255,255,255,.9); padding:0 36px; display:flex; align-items:center; gap:18px;
+}
+.ticker-item::after { content:'★'; font-size:8px; color:rgba(255,255,255,.5); }
+@keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ── VERBAL POSTURE SECTION ── */
+#verbal {
+  background:var(--challenger);
+  padding: 100px 52px;
+  position:relative; overflow:hidden;
+}
+
+.verbal-grid {
+  display:grid; gap:4px;
+  max-width:1100px; margin:0 auto;
+}
+
+.verbal-line {
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:12px;
+  opacity:0; transform:translateY(20px);
+  transition:opacity .6s, transform .6s;
+}
+.verbal-line.visible { opacity:1; transform:translateY(0); }
+
+.vl-bold {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(28px,3.8vw,56px);
+  font-weight:400; color:var(--base); line-height:1.05;
+  text-transform:uppercase; letter-spacing:-.01em;
+}
+.vl-italic {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(26px,3.5vw,52px);
+  font-style:italic; color:var(--canvas); line-height:1.05;
+}
+
+.verbal-note {
+  margin-top:48px; padding:16px 24px;
+  border:1px solid rgba(13,27,42,.25); display:inline-block;
+  font-size:11px; font-weight:600; color:rgba(13,27,42,.7); letter-spacing:.1em;
+  opacity:0; transition:opacity .6s .4s;
+}
+.verbal-note.visible { opacity:1; }
+
+/* ── ABOUT ── */
+#about {
+  background:var(--canvas);
+  padding:120px 52px;
+  position:relative; overflow:hidden;
+}
+
+/* Data Grid pattern bg */
+#about::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(13,27,42,.06) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;
+}
+
+.about-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; position:relative; }
+
+.section-tag {
+  font-size:10px; font-weight:700; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--challenger); margin-bottom:20px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-tag::before { content:''; width:20px; height:1.5px; background:var(--challenger); }
+
+.about-h2 {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(38px,3.5vw,58px); line-height:1.05;
+  color:var(--base); margin-bottom:28px;
+}
+.about-h2 em { font-style:italic; color:var(--challenger); }
+
+.about-body {
+  font-size:16px; font-weight:300; line-height:1.85;
+  color:rgba(13,27,42,.7); margin-bottom:20px;
+}
+
+.stat-row { display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-top:44px; }
+
+.stat-cell {
+  background:var(--base); padding:32px 28px;
+  transition:background .3s;
+}
+.stat-cell:hover { background:var(--challenger); }
+.stat-cell:hover .stat-n, .stat-cell:hover .stat-l { color:white; }
+
+.stat-n {
+  font-family:'DM Serif Display', serif;
+  font-size:48px; color:var(--premium); line-height:1;
+  transition:color .3s;
+}
+.stat-l {
+  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+  color:rgba(245,240,232,.45); margin-top:8px; transition:color .3s;
+}
+
+/* About right — index card stack */
+.about-right { position:relative; }
+
+.index-card {
+  background:white; border-radius:4px;
+  padding:36px 32px;
+  box-shadow:0 2px 0 var(--base), 4px 4px 0 var(--base);
+  margin-bottom:16px;
+  border-top:4px solid var(--challenger);
+  transition:transform .2s, box-shadow .2s;
+}
+.index-card:nth-child(2) { border-top-color:var(--data); margin-left:24px; }
+.index-card:nth-child(3) { border-top-color:var(--premium); margin-left:12px; }
+.index-card:hover { transform:translateY(-3px) rotate(.5deg); box-shadow:0 8px 0 var(--base), 8px 12px 0 var(--base); }
+
+.card-label { font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-light); margin-bottom:10px; }
+.card-title { font-family:'DM Serif Display', serif; font-size:22px; color:var(--base); margin-bottom:10px; }
+.card-body  { font-size:14px; font-weight:300; line-height:1.7; color:rgba(13,27,42,.65); }
+
+/* ── SERVICES ── */
+#services {
+  background:var(--base);
+  padding:120px 52px;
+}
+
+.services-top { max-width:1200px; margin:0 auto 64px; display:flex; justify-content:space-between; align-items:flex-end; }
+
+.services-h2 {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(38px,3.5vw,58px); line-height:1.05;
+  color:var(--canvas);
+}
+.services-h2 em { font-style:italic; color:var(--challenger); }
+
+.services-desc {
+  max-width:300px; font-size:15px; font-weight:300; line-height:1.7;
+  color:rgba(245,240,232,.5); text-align:right;
+}
+
+.svc-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  border:1px solid rgba(245,240,232,.1);
+  max-width:1200px; margin:0 auto;
+}
+
+.svc-card {
+  padding:48px 36px;
+  border-right:1px solid rgba(245,240,232,.1);
+  border-bottom:1px solid rgba(245,240,232,.1);
+  position:relative; overflow:hidden;
+  transition:background .3s;
+  cursor:default;
+}
+.svc-card:nth-child(3n) { border-right:none; }
+.svc-card:hover { background:var(--challenger); }
+.svc-card:hover .svc-num, .svc-card:hover .svc-title, .svc-card:hover .svc-body { color:white; }
+.svc-card:hover .svc-tags span { border-color:rgba(255,255,255,.3); color:rgba(255,255,255,.7); }
+
+.svc-num { font-size:11px; font-weight:700; letter-spacing:.2em; color:rgba(245,240,232,.2); margin-bottom:20px; transition:color .3s; }
+.svc-icon { font-size:28px; margin-bottom:16px; }
+.svc-title { font-family:'DM Serif Display', serif; font-size:24px; color:var(--canvas); margin-bottom:12px; line-height:1.1; transition:color .3s; }
+.svc-body { font-size:13px; font-weight:300; line-height:1.7; color:rgba(245,240,232,.5); transition:color .3s; }
+.svc-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:20px; }
+.svc-tags span {
+  font-size:9px; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+  padding:4px 10px; border-radius:100px; border:1px solid rgba(245,240,232,.15);
+  color:rgba(245,240,232,.35); transition:border-color .3s, color .3s;
+}
+
+/* ── WORK ── */
+#work {
+  background:var(--canvas-mid);
+  padding:120px 52px;
+}
+
+.work-top { max-width:1200px; margin:0 auto 64px; }
+
+.work-h2 {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(38px,3.5vw,58px); line-height:1.05; color:var(--base);
+}
+.work-h2 em { font-style:italic; color:var(--challenger); }
+.work-note { font-size:12px; font-style:italic; color:var(--ink-light); margin-top:12px; }
+
+.cases { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:1200px; margin:0 auto; }
+
+.case {
+  border-radius:12px; overflow:hidden; position:relative;
+  min-height:320px; display:flex; flex-direction:column; justify-content:flex-end;
+  padding:36px; cursor:pointer; transition:transform .3s;
+}
+.case:hover { transform:translateY(-4px); }
+.case.wide { grid-column:span 2; min-height:220px; }
+
+.case-bg { position:absolute; inset:0; z-index:0; }
+.case-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(13,27,42,.95) 0%, rgba(13,27,42,.15) 70%); z-index:1; }
+.case-content { position:relative; z-index:2; }
+
+.case-ind { font-size:9px; font-weight:700; letter-spacing:.25em; text-transform:uppercase; color:var(--premium); margin-bottom:8px; }
+.case-client { font-family:'DM Serif Display', serif; font-size:30px; color:white; line-height:1.05; margin-bottom:8px; }
+.case-desc { font-size:13px; color:rgba(255,255,255,.6); line-height:1.5; }
+.case-metric { display:inline-block; margin-top:14px; background:var(--challenger); color:white; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:6px 14px; border-radius:100px; }
+
+.case-auto  .case-bg { background:linear-gradient(135deg,#5C2E00,#C4622D); }
+.case-telco .case-bg { background:linear-gradient(135deg,#003366,#005B99); }
+.case-fmcg  .case-bg { background:linear-gradient(135deg,#5C1010,#B84A1E); }
+.case-energy .case-bg { background:linear-gradient(135deg,#0D2B0D,#2D5A1B); }
+
+/* ── PROOF MATRIX DIVIDER ── */
+.proof-matrix {
+  background:var(--base);
+  padding:60px 0;
+  overflow:hidden;
+}
+
+.matrix-text {
+  font-family:'Raleway', sans-serif;
+  font-weight:900; font-size:clamp(18px,2.2vw,28px);
+  letter-spacing:.05em; text-transform:uppercase;
+  white-space:nowrap; display:block;
+}
+
+.matrix-row {
+  display:flex; gap:0; width:max-content;
+  margin-bottom:6px;
+}
+
+.matrix-row.odd  { animation:tick 20s linear infinite; }
+.matrix-row.even { animation:tick2 24s linear infinite; }
+
+.matrix-chunk { display:flex; }
+
+.proof-big  { color:var(--challenger); }
+.proof-sm   { color:rgba(245,240,232,.12); font-size:clamp(10px,1.1vw,14px); padding:0 28px; }
+
+@keyframes tick2 { from{transform:translateX(-50%)} to{transform:translateX(0)} }
+
+/* ── CONTACT ── */
+#contact {
+  background:var(--data);
+  padding:120px 52px;
+  position:relative; overflow:hidden;
+}
+
+/* Arch rings */
+#contact::before {
+  content:'';
+  position:absolute; right:-100px; top:-100px;
+  width:600px; height:600px;
+  border-radius:50%;
+  border:80px solid rgba(255,255,255,.08);
+  box-shadow:0 0 0 130px rgba(255,255,255,.04);
+}
+
+.contact-inner { max-width:720px; margin:0 auto; position:relative; z-index:2; }
+
+.contact-tag {
+  font-size:10px; font-weight:700; letter-spacing:.3em; text-transform:uppercase;
+  color:rgba(255,255,255,.65); margin-bottom:24px;
+  display:flex; align-items:center; gap:12px;
+}
+.contact-tag::before { content:'★ ★ ★'; font-size:8px; letter-spacing:.3em; }
+
+.contact-h2 {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(48px,6vw,88px); line-height:.9;
+  color:white; margin-bottom:16px;
+}
+.contact-h2 em { font-style:italic; color:var(--base); }
+
+.contact-sub {
+  font-size:17px; font-weight:300; line-height:1.7;
+  color:rgba(255,255,255,.75); margin-bottom:48px;
+}
+
+.form { display:flex; flex-direction:column; gap:14px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.field { display:flex; flex-direction:column; gap:7px; }
+.field label { font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+.field input, .field select, .field textarea {
+  background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.25);
+  border-radius:8px; padding:13px 16px;
+  font-family:'Raleway',sans-serif; font-size:15px; font-weight:300;
+  color:white; outline:none; transition:border-color .2s, background .2s; width:100%;
+}
+.field input::placeholder, .field textarea::placeholder { color:rgba(255,255,255,.35); }
+.field input:focus, .field select:focus, .field textarea:focus { border-color:white; background:rgba(255,255,255,.18); }
+.field select option { color:var(--base); background:var(--canvas); }
+.field textarea { resize:vertical; min-height:110px; }
+
+.form-btn {
+  background:var(--base); color:var(--canvas);
+  padding:17px 38px; border-radius:100px;
+  font-family:'Raleway',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase;
+  border:none; cursor:none; transition:background .2s, transform .2s;
+  align-self:flex-start;
+}
+.form-btn:hover { background:#060f17; transform:translateY(-2px); }
+
+/* ── FOOTER ── */
+footer {
+  background:var(--base);
+  padding:36px 52px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-top:1px solid rgba(232,84,26,.3);
+}
+
+.footer-logo { display:flex; flex-direction:column; line-height:1; }
+.footer-logo .fl-the { font-size:9px; font-weight:300; letter-spacing:.25em; text-transform:uppercase; color:rgba(245,240,232,.3); }
+.footer-logo .fl-pop { font-size:22px; font-weight:900; letter-spacing:-.02em; color:var(--canvas); }
+.footer-logo .fl-pop span { color:var(--challenger); }
+.footer-logo .fl-co  { font-size:9px; font-weight:300; letter-spacing:.25em; text-transform:uppercase; color:rgba(245,240,232,.25); }
+
+.footer-tag { font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(245,240,232,.25); }
+.footer-copy { font-size:11px; color:rgba(245,240,232,.2); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.reveal { opacity:0; transform:translateY(28px); transition:opacity .65s ease, transform .65s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav { padding:16px 24px; }
+  .nav-links { display:none; }
+  #home { grid-template-columns:1fr; }
+  .hero-right { display:none; }
+  .hero-left { padding:80px 24px; }
+  .about-inner, .services-top, .work-top { grid-template-columns:1fr; }
+  .svc-grid { grid-template-columns:1fr; }
+  .cases { grid-template-columns:1fr; }
+  .case.wide { grid-column:span 1; }
+  footer { flex-direction:column; gap:16px; text-align:center; }
+  #about, #services, #work, #contact { padding:80px 24px; }
+  .form-row { grid-template-columns:1fr; }
+  .services-top { flex-direction:column; align-items:flex-start; gap:16px; }
+  .services-desc { text-align:left; max-width:100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a href="#home" class="nav-logo">
+    <span class="nav-logo-the">the</span>
+    <span class="nav-logo-pop"><span>P</span>OP digital</span>
+    <span class="nav-logo-co">co.</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact" class="nav-cta">Let's Talk</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="home">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Toronto · Paid Digital · thepopdigitalco.ca</div>
+    <h1 class="hero-h1">
+      Don't trust<br>
+      <em>us.</em><br>
+      Trust the <span class="ghost">math.</span>
+    </h1>
+    <p class="hero-copy">We are The Proof Over Promises Company. A boutique paid digital agency running performance campaigns for the brands that move the world — automotive, energy, and telecom.</p>
+    <div class="hero-pull">"We don't sell the future. We prove the present."</div>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Start the Conversation</a>
+      <a href="#work" class="btn-ghost">See the Proof</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="badge-wrap">
+      <!-- The Badge — Concept A from NotebookLM -->
+      <div class="badge">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer ring -->
+          <circle cx="100" cy="100" r="96" fill="none" stroke="#E8541A" stroke-width="2"/>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="#E8541A" stroke-width=".5" stroke-dasharray="4 3"/>
+          <!-- Inner filled circle -->
+          <circle cx="100" cy="100" r="80" fill="#E8541A" opacity=".15"/>
+          <!-- POP letterform -->
+          <!-- P -->
+          <rect x="30" y="68" width="8" height="64" rx="2" fill="#E8541A"/>
+          <path d="M38 68 Q58 68 58 84 Q58 100 38 100" fill="none" stroke="#E8541A" stroke-width="8" stroke-linecap="round"/>
+          <!-- O -->
+          <circle cx="96" cy="100" r="22" fill="none" stroke="#E8541A" stroke-width="8"/>
+          <!-- P (right) -->
+          <rect x="128" y="68" width="8" height="64" rx="2" fill="#E8541A"/>
+          <path d="M136 68 Q156 68 156 84 Q156 100 136 100" fill="none" stroke="#E8541A" stroke-width="8" stroke-linecap="round"/>
+          <!-- Circular text -->
+          <path id="textCircle" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0" fill="none"/>
+          <text font-family="Raleway, sans-serif" font-size="9" font-weight="700" letter-spacing="6" fill="#E8541A" opacity=".7">
+            <textPath href="#textCircle">PROOF OVER PROMISES · THEPOPDIGITALCO.CA · </textPath>
+          </text>
+        </svg>
+      </div>
+      <div class="badge-wordmark">
+        <span class="wm-the">the</span>
+        <span class="wm-pop">POP</span>
+        <span class="wm-co">co.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <div class="ticker-item">Paid Search</div>
+      <div class="ticker-item">Paid Social</div>
+      <div class="ticker-item">Programmatic</div>
+      <div class="ticker-item">Automotive</div>
+      <div class="ticker-item">Energy & Gas</div>
+      <div class="ticker-item">Telecommunications</div>
+      <div class="ticker-item">Proof Over Promises</div>
+      <div class="ticker-item">thepopdigitalco.ca</div>
+      <div class="ticker-item">Paid Search</div>
+      <div class="ticker-item">Paid Social</div>
+      <div class="ticker-item">Programmatic</div>
+      <div class="ticker-item">Automotive</div>
+      <div class="ticker-item">Energy & Gas</div>
+      <div class="ticker-item">Telecommunications</div>
+      <div class="ticker-item">Proof Over Promises</div>
+      <div class="ticker-item">thepopdigitalco.ca</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ VERBAL POSTURE ══ -->
+<section id="verbal">
+  <div class="verbal-grid">
+    <div class="verbal-line"><span class="vl-bold">We deal in data.</span><span class="vl-italic">Promises are for amateurs.</span></div>
+    <div class="verbal-line"><span class="vl-italic">The</span><span class="vl-bold">Proof Over Promises</span><span class="vl-bold">Digital Co.</span></div>
+    <div class="verbal-line"><span class="vl-italic">Boutique attention.</span><span class="vl-bold">Enterprise arithmetic.</span></div>
+    <div class="verbal-line"><span class="vl-italic">Don't trust us.</span><span class="vl-bold">Trust the math.</span></div>
+    <div class="verbal-line"><span class="vl-bold">Performance marketing</span><span class="vl-italic">without the fiction.</span></div>
+    <div class="verbal-line"><span class="vl-bold">We don't sell the future.</span><span class="vl-italic">We prove the present.</span></div>
+  </div>
+  <div class="verbal-note">Voice System: designed to be slightly abrasive to the status quo, yet deeply reassuring to a data-driven client.</div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section id="about">
+  <div class="about-inner">
+    <div>
+      <div class="section-tag reveal">About The POP Digital Co.</div>
+      <h2 class="about-h2 reveal">We don't sell<br><em>potential.</em><br>We deliver proof.</h2>
+      <p class="about-body reveal">The POP Digital Co. is a boutique paid digital media agency built on one belief: your marketing partner should be measured by results, not presentations. We specialize in paid search, paid social, and programmatic — with deep roots in automotive and growing expertise in energy and telecommunications.</p>
+      <p class="about-body reveal">We've run campaigns for Harley-Davidson, Telus, Rogers, and Coca-Cola. We know what moves the needle in complex, high-stakes industries. The numbers prove it.</p>
+      <div class="stat-row reveal">
+        <div class="stat-cell"><div class="stat-n">$50M+</div><div class="stat-l">Media Managed</div></div>
+        <div class="stat-cell"><div class="stat-n">3.8×</div><div class="stat-l">Avg. ROAS</div></div>
+        <div class="stat-cell"><div class="stat-n">15+</div><div class="stat-l">Enterprise Clients</div></div>
+        <div class="stat-cell"><div class="stat-n">100%</div><div class="stat-l">Proof. No Promises.</div></div>
+      </div>
+    </div>
+
+    <div class="about-right reveal">
+      <div class="index-card">
+        <div class="card-label">The Philosophy</div>
+        <div class="card-title">Proof Over Promises</div>
+        <div class="card-body">Every agency promises results. We start the relationship by showing you what we've actually delivered — then we go prove it again on your account.</div>
+      </div>
+      <div class="index-card">
+        <div class="card-label">The Specialization</div>
+        <div class="card-title">Paid Digital. Full Stop.</div>
+        <div class="card-body">Paid search, paid social, programmatic. We don't dabble in SEO, we don't build websites. We run paid media — and we run it exceptionally well.</div>
+      </div>
+      <div class="index-card">
+        <div class="card-label">The Clientele</div>
+        <div class="card-title">Auto. Energy. Telecom.</div>
+        <div class="card-body">Telus, Harley-Davidson, Coca-Cola, Rogers. Complex industries with long sales cycles and high stakes — exactly where precision paid media matters most.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SERVICES ══ -->
+<section id="services">
+  <div class="services-top reveal">
+    <h2 class="services-h2">What we<br><em>actually</em> do.</h2>
+    <p class="services-desc">No fluff. No vanity metrics. Every service answers one question: does it drive measurable business results?</p>
+  </div>
+
+  <div class="svc-grid">
+    <div class="svc-card reveal">
+      <div class="svc-num">01</div>
+      <div class="svc-icon">🎯</div>
+      <div class="svc-title">Paid Search</div>
+      <p class="svc-body">Google & Bing campaigns engineered for intent. We capture buyers at the exact moment of decision — from inventory searches to energy provider comparisons.</p>
+      <div class="svc-tags"><span>Auto</span><span>Energy</span><span>Telecom</span></div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-num">02</div>
+      <div class="svc-icon">📱</div>
+      <div class="svc-title">Paid Social</div>
+      <p class="svc-body">Meta, TikTok, LinkedIn. We build audiences that convert, not just scroll. Creative strategy meets precision targeting on every platform that matters.</p>
+      <div class="svc-tags"><span>Auto</span><span>FMCG</span><span>Telecom</span></div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-num">03</div>
+      <div class="svc-icon">📡</div>
+      <div class="svc-title">Programmatic</div>
+      <p class="svc-body">Display, video, and connected TV at scale. We reach your audience wherever they are — and we retarget until they act.</p>
+      <div class="svc-tags"><span>Auto</span><span>Energy</span><span>Enterprise</span></div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-num">04</div>
+      <div class="svc-icon">📊</div>
+      <div class="svc-title">Strategy & Analytics</div>
+      <p class="svc-body">Attribution, media mix modelling, and dashboards that speak CFO and CMO. We make the math legible — and undeniable.</p>
+      <div class="svc-tags"><span>All Verticals</span></div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-num">05</div>
+      <div class="svc-icon">🚗</div>
+      <div class="svc-title">Automotive Digital</div>
+      <p class="svc-body">OEM to dealer group — inventory-level campaigns, conquest strategy, and VDP traffic that converts. Built for how car buyers actually shop.</p>
+      <div class="svc-tags"><span>Dealer Groups</span><span>OEM</span></div>
+    </div>
+    <div class="svc-card reveal">
+      <div class="svc-num">06</div>
+      <div class="svc-icon">⚡</div>
+      <div class="svc-title">Energy & Utilities</div>
+      <p class="svc-body">Reaching consumers and B2B buyers in a regulated, trust-sensitive industry. We know how to build campaigns that convert in energy, gas, and utilities.</p>
+      <div class="svc-tags"><span>Gas</span><span>Utilities</span><span>B2B</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROOF MATRIX DIVIDER ══ -->
+<div class="proof-matrix">
+  <div class="matrix-row odd">
+    <div class="matrix-chunk">
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+    </div>
+    <div class="matrix-chunk" aria-hidden="true">
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+    </div>
+  </div>
+  <div class="matrix-row even" style="margin-top:8px">
+    <div class="matrix-chunk">
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+    </div>
+    <div class="matrix-chunk" aria-hidden="true">
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-sm">proof over promises&nbsp;&nbsp;</span>
+      <span class="matrix-text proof-big">PROOF OVER PROMISES&nbsp;&nbsp;</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WORK ══ -->
+<section id="work">
+  <div class="work-top">
+    <div class="section-tag reveal">Case Studies</div>
+    <h2 class="work-h2 reveal">The <em>proof</em><br>is in the work.</h2>
+    <p class="work-note reveal">* Client names reflect previous agency experience. Campaign details available on request.</p>
+  </div>
+
+  <div class="cases">
+    <div class="case case-telco reveal">
+      <div class="case-bg"></div><div class="case-overlay"></div>
+      <div class="case-content">
+        <div class="case-ind">Telecommunications</div>
+        <div class="case-client">Telus</div>
+        <div class="case-desc">Owned the account for 3 years. Built a full-funnel paid digital strategy that drove consistent online sales growth — hitting 10–15% CPA improvement goals year over year.</div>
+        <div class="case-metric">↓ 15% CPA YoY — 3 Years Running</div>
+      </div>
+    </div>
+    <div class="case case-auto reveal">
+      <div class="case-bg"></div><div class="case-overlay"></div>
+      <div class="case-content">
+        <div class="case-ind">Automotive · GroupM / Google Award</div>
+        <div class="case-client">Most Connected<br>GMP — Google</div>
+        <div class="case-desc">Built a custom algorithm integrating real-world foot traffic data as the conversion signal for digital campaigns. Won Google's "Most Connected GMP" case study award.</div>
+        <div class="case-metric">🏆 Google Award Winner</div>
+      </div>
+    </div>
+    <div class="case case-fmcg reveal">
+      <div class="case-bg"></div><div class="case-overlay"></div>
+      <div class="case-content">
+        <div class="case-ind">FMCG · Coca-Cola × Walmart</div>
+        <div class="case-client">Coca-Cola<br>In-Store Attribution</div>
+        <div class="case-desc">Built a closed-loop attribution model tracking in-store Walmart purchases against digital ad exposure — proving a direct 15% purchase lift among customers who saw our ads.</div>
+        <div class="case-metric">↑ 15% In-Store Purchase Lift</div>
+      </div>
+    </div>
+    <div class="case case-auto reveal">
+      <div class="case-bg"></div><div class="case-overlay"></div>
+      <div class="case-content">
+        <div class="case-ind">Automotive</div>
+        <div class="case-client">Harley-Davidson</div>
+        <div class="case-desc">Conquest and loyalty campaigns with inventory-level paid social and precision retargeting across high-intent rider audiences.</div>
+        <div class="case-metric">↑ 58% Test Ride Bookings</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-tag">Let's Work Together</div>
+    <h2 class="contact-h2">Ready for<br><em>proof?</em></h2>
+    <p class="contact-sub">No pitch decks full of promises. Just a straight conversation about where you are, where you want to go, and what it would actually take to get there.</p>
+
+    <form class="form" onsubmit="return false;">
+      <div class="form-row">
+        <div class="field"><label>Your Name</label><input type="text" placeholder="Jane Smith"></div>
+        <div class="field"><label>Company</label><input type="text" placeholder="Acme Corp"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Email</label><input type="email" placeholder="jane@company.com"></div>
+        <div class="field">
+          <label>Industry</label>
+          <select>
+            <option value="" disabled selected>Select your industry</option>
+            <option>Automotive</option>
+            <option>Energy / Gas</option>
+            <option>Telecommunications</option>
+            <option>FMCG / Consumer</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>What are you working on?</label><textarea placeholder="Tell us about your goals, current challenges, or what's not working with your paid media right now..."></textarea></div>
+      <button type="submit" class="form-btn">Send It →</button>
+    </form>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo">
+    <span class="fl-the">the</span>
+    <span class="fl-pop"><span>P</span>OP digital</span>
+    <span class="fl-co">co.</span>
+  </div>
+  <div class="footer-tag">Proof Over Promises</div>
+  <div class="footer-copy">© 2026 The POP Digital Co. · Toronto, Ontario · thepopdigitalco.ca</div>
+</footer>
+
+<script>
+// Cursor
+const cur = document.getElementById('cur');
+const curR = document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+(function loop(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; curR.style.left=rx+'px'; curR.style.top=ry+'px'; requestAnimationFrame(loop); })();
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{ if(e.isIntersecting) setTimeout(()=>e.target.classList.add('visible'), i*70); });
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Verbal posture reveal
+const vObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.verbal-line').forEach((l,i)=>{
+        setTimeout(()=>l.classList.add('visible'),i*120);
+      });
+      e.target.querySelector('.verbal-note')?.classList.add('visible');
+    }
+  });
+},{threshold:.2});
+document.querySelectorAll('#verbal').forEach(el=>vObs.observe(el));
+</script>
+</body>
+</html>

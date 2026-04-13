@@ -839,14 +839,14 @@ footer {
 
     <form class="form" action="https://formspree.io/f/mbdqjavy" method="POST">
       <div class="form-row">
-        <div class="field"><label>Your Name</label><input type="text" placeholder="Jane Smith"></div>
-        <div class="field"><label>Company</label><input type="text" placeholder="Acme Corp"></div>
+        <div class="field"><label>Your Name</label><input type="text" name="name" placeholder="Jane Smith"></div>
+        <div class="field"><label>Company</label><input type="text" name="company" placeholder="Acme Corp"></div>
       </div>
       <div class="form-row">
-        <div class="field"><label>Email</label><input type="email" placeholder="jane@company.com"></div>
+        <div class="field"><label>Email</label><input type="email" name="email" placeholder="jane@company.com"></div>
         <div class="field">
           <label>Industry</label>
-          <select>
+          <select name="industry">
             <option value="" disabled selected>Select your industry</option>
             <option>Automotive</option>
             <option>Energy / Gas</option>
@@ -856,7 +856,7 @@ footer {
           </select>
         </div>
       </div>
-      <div class="field"><label>What are you working on?</label><textarea placeholder="Tell us about your goals, current challenges, or what's not working with your paid media right now..."></textarea></div>
+      <div class="field"><label>What are you working on?</label><textarea name="message" placeholder="Tell us about your goals, current challenges, or what's not working with your paid media right now..."></textarea></div>
       <button type="submit" class="form-btn">Send It →</button>
     </form>
   </div>
